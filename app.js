@@ -36,7 +36,7 @@ async function main(){
 
 }
 
-app.set("views engine", "ejs");
+app.set("view engine", "ejs");
 app.set("views", path.join(__dirname,"views"));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
@@ -93,17 +93,18 @@ app.use("/", reviewRouter);
 app.use("/", userRouter);
 
 //Error Handling Middlewares
-app.all("*",(err, req, res, next) =>{
+app.all("*",(req, res, next) =>{
     next(new ExpressError( 404, "Page Not Found!!!"));
-    console.log(err);
+    // console.log(err);
 });
 
 app.use((err, req, res, next) => {
-    let {status=500, message="Something went wrong"} = err;
+    const {status=500, message="Something went wrong"} = err;
     res.status(status).render("error.ejs", {err});
     // res.status(status).send(message);
 });
 
-app.listen(8080, () => {
-    console.log("server is listening to port:8080");
-});
+// app.listen(8080, () => {
+//     console.log("server is listening to port:8080");
+// });
+module.exports = app;
