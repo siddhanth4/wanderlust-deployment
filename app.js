@@ -82,19 +82,19 @@ passport.deserializeUser(User.deserializeUser());
 
 
 //Middleware for Flash
-// app.use((req, res, next) => {
-//     let success = res.locals.success = req.flash("success");
-//     let error = res.locals.error = req.flash("error");
-//     let currUser = res.locals.currUser = req.user;  
-//     next();
-// });
-
 app.use((req, res, next) => {
-    res.locals.success = req.flash("success");
-    res.locals.error = req.flash("error");
-    res.locals.currUser = req.user;
+    let success = res.locals.success = req.flash("success");
+    let error = res.locals.error = req.flash("error");
+    let currUser = res.locals.currUser = req.user;  
     next();
 });
+
+// app.use((req, res, next) => {
+//     res.locals.success = req.flash("success");
+//     res.locals.error = req.flash("error");
+//     res.locals.currUser = req.user;
+//     next();
+// });
 
 app.get("/", (req, res) => {
     res.redirect("/listings");
