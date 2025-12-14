@@ -22,19 +22,23 @@ const userRouter = require("./routes/user.js");
 
 // const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 const dbUrl = process.env.ATLASDB_URL;
-main()
-   .then(() => {
-      console.log("connected to db");
-   })
-   .catch((err) => {
-      console.log(err);
-   });
 
-async function main(){
-    await mongoose.connect(dbUrl);
-    // await mongoose.connect(MONGO_URL);
-
+async function connectDB() {
+    if (mongoose.connection.readyState === 0) {
+        await mongoose.connect(dbUrl);
+        console.log("Connected to DB");
+    }
 }
+
+connectDB().catch((err) => {
+    console.log("MongoDB connection error:", err);
+});
+
+// async function main(){
+//     await mongoose.connect(dbUrl);
+//     // await mongoose.connect(MONGO_URL);
+
+// }
 
 app.engine('ejs',ejsMate);
 app.set("view engine", "ejs");
@@ -53,9 +57,10 @@ const store = MongoStore.create({
     touchAfter: 24 * 3600,
 });
 
-store.on("error", () => {
+store.on("error", function (err) {
     console.log("Session Store Error", err);
 });
+
 
 const sessionOptions = {
     store,
@@ -111,11 +116,18 @@ app.all("*",(req, res, next) =>{
     // console.log(err);
 });
 
+// app.use((err, req, res, next) => {
+//     const {status=500, message="Something went wrong"} = err;
+//     res.status(status).render("error.ejs", {message});
+//     // res.status(status).send(message);
+// });
+
 app.use((err, req, res, next) => {
-    const {status=500, message="Something went wrong"} = err;
-    res.status(status).render("error.ejs", {message});
-    // res.status(status).send(message);
+    const status = err.status || 500;
+    const message = err.message || "Something went wrong";
+    res.status(status).render("error.ejs", { message });
 });
+
 
 // app.listen(8080, () => {
 //     console.log("server is listening to port:8080");
