@@ -88,7 +88,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/listings", listingRouter);
+app.use("/", listingRouter);
 app.use("/", reviewRouter);
 app.use("/", userRouter);
 
