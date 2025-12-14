@@ -36,11 +36,12 @@ async function main(){
 
 }
 
+app.engine('ejs',ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname,"views"));
+
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
-app.engine('ejs',ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
 
 const store = MongoStore.create({
@@ -81,12 +82,24 @@ passport.deserializeUser(User.deserializeUser());
 
 
 //Middleware for Flash
+// app.use((req, res, next) => {
+//     let success = res.locals.success = req.flash("success");
+//     let error = res.locals.error = req.flash("error");
+//     let currUser = res.locals.currUser = req.user;  
+//     next();
+// });
+
 app.use((req, res, next) => {
-    let success = res.locals.success = req.flash("success");
-    let error = res.locals.error = req.flash("error");
-    let currUser = res.locals.currUser = req.user;  
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    res.locals.currUser = req.user;
     next();
 });
+
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
 
 app.use("/listings", listingRouter);
 app.use("/", reviewRouter);
@@ -100,7 +113,7 @@ app.all("*",(req, res, next) =>{
 
 app.use((err, req, res, next) => {
     const {status=500, message="Something went wrong"} = err;
-    res.status(status).render("error.ejs", {err});
+    res.status(status).render("error.ejs", {message});
     // res.status(status).send(message);
 });
 
